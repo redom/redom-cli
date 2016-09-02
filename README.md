@@ -6,4 +6,4 @@ npm install -g redom-cli
 redom
 ```
 ## Notice
-Windows is not supported at the moment.
+Probably won't work on Windows at the moment.
