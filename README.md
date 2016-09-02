@@ -1,4 +1,4 @@
-# redom-cli
+# RE:DOM generator
 Generate RE:DOM projects easily!
 
 ```
