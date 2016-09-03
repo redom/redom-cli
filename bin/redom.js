@@ -88,7 +88,7 @@ function install (next) {
   }
 
   function buildPackageJSON (cb) {
-    fs.readFile('assets/package.json', { encoding: 'utf8' }, function (err, file) {
+    fs.readFile(__dirname + '/../' + 'assets/package.json', { encoding: 'utf8' }, function (err, file) {
       if (err) throw err;
 
       var json = JSON.parse(file);
@@ -102,23 +102,23 @@ function install (next) {
   }
 
   function copyPublic (cb) {
-    exec('cp', ['-r', 'assets/public', data.path + '/public'], cb);
+    exec('cp', ['-r', __dirname + '/../' + 'assets/public', data.path + '/public'], cb);
   }
 
   function copyJS (cb) {
-    exec('cp', ['-r', 'assets/js', data.path + '/js'], cb);
+    exec('cp', ['-r', __dirname + '/../' + 'assets/js', data.path + '/js'], cb);
   }
 
   function copyRollupConfig (cb) {
-    exec('cp', ['-r', 'assets/rollup.config.js', data.path + '/rollup.config.js'], cb);
+    exec('cp', ['-r', __dirname + '/../' + 'assets/rollup.config.js', data.path + '/rollup.config.js'], cb);
   }
 
   function copyServer (cb) {
-    exec('cp', ['assets/server.js', data.path + '/server.js'], cb);
+    exec('cp', [__dirname + '/../' + 'assets/server.js', data.path + '/server.js'], cb);
   }
 
   function copyWatch (cb) {
-    exec('cp', ['assets/watch.js', data.path + '/watch.js'], cb);
+    exec('cp', [__dirname + '/../' + 'assets/watch.js', data.path + '/watch.js'], cb);
   }
 
   function npmInstall () {
