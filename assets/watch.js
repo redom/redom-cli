@@ -2,30 +2,31 @@ require('./server');
 
 var cp = require('child_process');
 var chokidar = require('chokidar');
+var path = require('path');
 
-chokidar.watch('js/**/*.js')
-  .on('change', run('build-js'));
+var ROLLUP = 'rollup -c -f iife js/index.js -o public/js/main.js'.split(' ');
+var UGLIFY = 'uglifyjs public/js/main.js -cmo public/js/main.min.js'.split(' ');
 
-chokidar.watch('public/js/main.js')
-  .on('change', run('uglify-js'));
+chokidar.watch(path.resolve('js/**/*.js'))
+  .on('change', exec(ROLLUP));
 
-run('build-js')();
+chokidar.watch(path.resolve('public/js/main.js'))
+  .on('change', exec(UGLIFY));
 
-function run (script) {
+execNow(ROLLUP);
+
+function exec (cmd) {
   return function () {
-    exec('npm', ['run', script]);
+    var child = cp.spawn(cmd[0], cmd.slice(1));
+
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
   }
 }
 
-function exec () {
-  var args = new Array(arguments.length);
-
-  for (var i = 0; i < arguments.length; i++) {
-    args[i] = arguments[i];
-  }
-
-  var child = cp.spawn.apply(cp, args);
-
-  child.stdout.pipe(process.stdout);
-  child.stderr.pipe(process.stderr);
+function execNow (cmd) {
+  exec(cmd)();
 }
+
+console.log('Watching files in js/');
+console.log('');

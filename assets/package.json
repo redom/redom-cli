@@ -5,9 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node watch",
-    "start": "node server",
-    "build-js": "rollup -c -f iife js/index.js -o public/js/main.js",
-    "uglify-js": "uglifyjs public/js/main.js -cmo public/js/main.min.js"
+    "start": "node server"
   },
   "author": "",
   "license": "ISC",
