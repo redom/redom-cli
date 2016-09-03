@@ -1,5 +1,5 @@
 # RE:DOM project generator
-Generate [RE:DOM](https://redom.js.org) projects easily!
+Initialize [RE:DOM](https://redom.js.org) projects easily!
 
 ```
 npm install -g redom-cli
