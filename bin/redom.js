@@ -4,7 +4,7 @@ var argv = process.argv;
 var cwd = process.cwd();
 
 var cp = require('child_process');
-var fs = require('fs');
+var fs = require('fs-extra');
 var readline = require('readline');
 var path = require('path');
 
@@ -36,7 +36,7 @@ function askName (next) {
 function askPath (next) {
   ask('Relative path where to init', data.name, function (_path) {
     data.path = _path;
-    data.absolutepath = path.join(cwd, _path);
+    data.absolutepath = path.resolve(cwd, _path);
     next();
   })
 }
@@ -85,17 +85,17 @@ function install (next) {
   flow([makeDir, buildPackageJSON, copyJS, copyPublic, copyRollupConfig, copyServer, copyWatch, npmInstall]);
 
   function makeDir (cb) {
-    exec('mkdir', ['-p', data.path], cb);
+    fs.mkdirs(data.absolutepath, cb);
   }
 
   function buildPackageJSON (cb) {
-    fs.readFile(path.join(__dirname, '..', 'assets', 'package.json'), { encoding: 'utf8' }, function (err, file) {
+    fs.readFile(path.resolve(__dirname, '../assets/package.json'), { encoding: 'utf8' }, function (err, file) {
       if (err) throw err;
 
       var json = JSON.parse(file);
       json.name = data.name;
 
-      fs.writeFile(path.join(data.path, 'package.json'), JSON.stringify(json, null, 2), function (err) {
+      fs.writeFile(path.resolve(data.path, 'package.json'), JSON.stringify(json, null, 2), function (err) {
         if (err) throw err;
         cb();
       });
@@ -103,28 +103,38 @@ function install (next) {
   }
 
   function copyPublic (cb) {
-    exec('cp', ['-r', path.join(__dirname, '..', 'assets', 'public'), path.join(data.path, 'public')], cb);
+    var source = path.resolve(__dirname, '../assets/public');
+    var target = path.resolve(data.path, 'public');
+    fs.copy(source, target, cb);
   }
 
   function copyJS (cb) {
-    exec('cp', ['-r', path.join(__dirname, '..', 'assets', 'js'), path.join(data.path, 'js')], cb);
+    var source = path.resolve(__dirname, '../assets/js');
+    var target = path.resolve(data.path, 'js');
+    fs.copy(source, target, cb);
   }
 
   function copyRollupConfig (cb) {
-    exec('cp', ['-r', path.join(__dirname, '..', 'assets', 'rollup.config.js'), path.join(data.path + 'rollup.config.js')], cb);
+    var source = path.resolve(__dirname, '../assets/rollup.config.js');
+    var target = path.resolve(data.path, 'rollup.config.js');
+    fs.copy(source, target, cb);
   }
 
   function copyServer (cb) {
-    exec('cp', [path.join(__dirname, '..', 'assets', 'server.js'), path.join(data.path + 'server.js')], cb);
+    var source = path.resolve(__dirname, '../assets/server.js');
+    var target = path.resolve(data.path, 'server.js');
+    fs.copy(source, target, cb);
   }
 
   function copyWatch (cb) {
-    exec('cp', [path.join(__dirname, '..', 'assets', 'watch.js'), path.join(data.path + 'watch.js')], cb);
+    var source = path.resolve(__dirname, '../assets/watch.js');
+    var target = path.resolve(data.path, 'watch.js');
+    fs.copy(source, target, cb);
   }
 
   function npmInstall () {
     console.log('Running npm install...');
-    exec('npm', ['install'], { cwd: path.join(cwd, data.path) }, next);
+    exec('npm', ['install'], { cwd: path.resolve(cwd, data.path) }, next);
   }
 }
 
