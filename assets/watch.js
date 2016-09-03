@@ -7,7 +7,7 @@ chokidar.watch('js/**/*.js')
   .on('change', run('build-js'));
 
 chokidar.watch('public/js/main.js')
-  .on('change', run('build-js'));
+  .on('change', run('uglify-js'));
 
 run('build-js')();
 
