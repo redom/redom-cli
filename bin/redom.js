@@ -57,7 +57,7 @@ function confirm (cancel) {
       console.log('Path already exists!');
       ask('Are you sure you want to replace the existing path?', 'n', function (answer) {
         if (answer === 'y' || answer === 'Y') {
-          exec('rm', ['-r', data.path], next);
+          fs.remove(data.path, next);
         } else {
           cancel();
         }
@@ -134,7 +134,17 @@ function install (next) {
 
   function npmInstall () {
     console.log('Running npm install...');
-    exec('npm', ['install'], { cwd: path.resolve(cwd, data.path) }, next);
+    exec('npm', ['install'], { cwd: path.resolve(cwd, data.path) }, function (err) {
+      if (err) {
+        console.log('');
+        console.log('For some reason calling npm install failed on your machine.')
+        console.log("Don't worry, you can do it manually, just follow the instructions.");
+        data.npmfailed = true;
+        next();
+      } else {
+        next();
+      }
+    });
   }
 }
 
@@ -144,6 +154,7 @@ function done () {
   console.log('Now just type:');
   console.log('');
   console.log('cd ' + data.path);
+  if (data.npmfailed) { console.log('npm run install'); }
   console.log('npm run dev');
   console.log('');
   console.log("And you're ready to start developing!");
@@ -193,7 +204,7 @@ function exec () {
   child.stderr.pipe(process.stderr);
 
   child.on('error', function (err) {
-    throw err;
+    cb && cb(err);
   });
 
   child.on('exit', function () {
