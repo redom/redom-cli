@@ -15,7 +15,7 @@
     "rollup": "~0.34.13",
     "rollup-plugin-buble": "~0.13.0",
     "rollup-plugin-node-resolve": "~2.0.0",
-    "uglifyjs": "~2.4.10"
+    "uglify-js": "~2.7.3"
   },
   "dependencies": {
     "compression": "~1.6.2",
