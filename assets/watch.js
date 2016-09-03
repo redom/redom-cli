@@ -9,11 +9,8 @@ var buble = require('rollup-plugin-buble');
 var nodeResolve = require('rollup-plugin-node-resolve');
 var uglifyjs = require('uglify-js');
 
-chokidar.watch(path.resolve('js/**/*.js'))
-  .on('change', buildJS);
-
-chokidar.watch(path.resolve('public/js/main.js'))
-  .on('change', uglifyJS);
+chokidar.watch(path.resolve('js/**/*.js')).on('change', buildJS);
+chokidar.watch(path.resolve('public/js/main.js')).on('change', uglifyJS);
 
 buildJS();
 
@@ -40,19 +37,6 @@ function uglifyJS () {
   fs.writeFile(path.resolve('public/js/main.min.js'), result.code, { encoding: 'utf8' }, function (err) {
     if (err) console.error(err);
   });
-}
-
-function exec (cmd) {
-  return function () {
-    var child = cp.spawn(cmd[0], cmd.slice(1));
-
-    child.stdout.pipe(process.stdout);
-    child.stderr.pipe(process.stderr);
-  }
-}
-
-function execNow (cmd) {
-  exec(cmd)();
 }
 
 console.log('Watching files in js/');
