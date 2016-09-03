@@ -13,12 +13,14 @@
   "license": "ISC",
   "devDependencies": {
     "chokidar": "~1.6.0",
-    "express": "~4.14.0",
     "redom": "~0.3.3",
     "rollup": "~0.34.13",
     "rollup-plugin-buble": "~0.13.0",
     "rollup-plugin-node-resolve": "~2.0.0",
     "uglifyjs": "~2.4.10"
   },
-  "dependencies": {}
+  "dependencies": {
+    "compression": "~1.6.2",
+    "express": "~4.14.0"
+  }
 }
