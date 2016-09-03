@@ -154,7 +154,7 @@ function done () {
   console.log('Now just type:');
   console.log('');
   console.log('cd ' + data.path);
-  if (data.npmfailed) { console.log('npm run install'); }
+  if (data.npmfailed) { console.log('npm install'); }
   console.log('npm run dev');
   console.log('');
   console.log("And you're ready to start developing!");
