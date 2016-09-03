@@ -14,5 +14,5 @@ To define path to install to, use
 redom my-project
 ```
 
-## Notice
-Probably won't work on Windows at the moment.
+## Notice for Windows users
+Windows (without bash) support coming soon. Should work with Windows 10 bash already.
