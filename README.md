@@ -13,6 +13,3 @@ To define path to install to, use
 ```
 redom my-project
 ```
-
-## Notice for Windows users
-Windows (without bash) support coming soon. Should work with Windows 10 bash already.
