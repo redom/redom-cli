@@ -12,6 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "~0.30.0"
+    "fs-extra": "~1.0.0"
   }
 }

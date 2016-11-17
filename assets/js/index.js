@@ -16,7 +16,7 @@ class Td {
 const Tr = list.extend('tr', Td);
 const Table = list.extend('table', Tr);
 
-const table = new Table;
+const table = new Table();
 
 mount(document.body, table);
 

@@ -20,8 +20,8 @@ flow([ intro, askName, askPath, checkPath, confirm(okBye), install, done ]);
 
 function intro (next) {
   console.log('');
-  console.log('This utility will initialize a RE:DOM project folder for you.')
-  console.log('Please answer some questions so we can start making DOM great again!');
+  console.log('This utility will initialize a RE:DOM project folder for you.');
+  console.log('Just answer these few questions.');
   console.log('');
   next();
 }
@@ -38,7 +38,7 @@ function askPath (next) {
     data.path = _path;
     data.absolutepath = path.resolve(cwd, _path);
     next();
-  })
+  });
 }
 
 function checkPath (next) {
@@ -71,11 +71,11 @@ function confirm (cancel) {
         }
       });
     }
-  }
+  };
 }
 
 function okBye () {
-  console.log('ok, bye!')
+  console.log('ok, bye!');
 }
 
 function install (next) {
@@ -137,7 +137,7 @@ function install (next) {
     exec('npm', ['install'], { cwd: path.resolve(cwd, data.path) }, function (err) {
       if (err) {
         console.log('');
-        console.log('For some reason calling npm install failed on your machine.')
+        console.log('For some reason calling npm install failed on your machine.');
         console.log("Don't worry, you can do it manually, just follow the instructions.");
         data.npmfailed = true;
         next();
