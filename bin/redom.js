@@ -158,6 +158,7 @@ function done () {
   console.log('npm run dev');
   console.log('');
   console.log("And you're ready to start developing!");
+  console.log('Visit https://redom.js.org for support');
 }
 
 function flow (actions) {
@@ -189,16 +190,8 @@ function ask (str, defaultValue, cb) {
   });
 }
 
-function exec () {
-  var args = new Array(arguments.length);
-
-  for (var i = 0; i < arguments.length; i++) {
-    args[i] = arguments[i];
-  }
-
-  var cb = args.pop();
-
-  var child = cp.spawn.apply(cp, args);
+function exec (cmd, args, opts, cb) {
+  var child = cp.spawn(cmd, args, opts);
 
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);

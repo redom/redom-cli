@@ -1,10 +1,11 @@
 (function () {
 'use strict';
 
-var doc = document;
+var HASH = '#'.charCodeAt(0);
+var DOT = '.'.charCodeAt(0);
 
 function createElement (query, ns) {
-  // query parsing magic by https://github.com/maciejhirsz
+  // query parsing magic, thank you @maciejhirsz
 
   var tag, id, className;
 
@@ -12,16 +13,14 @@ function createElement (query, ns) {
   var start = 0;
 
   for (var i = 0, len = query.length; i <= len; i++) {
-    var cp = i === len ? 0 : query.charCodeAt(i);
+    var cp = (i === len) ? 0 : query.charCodeAt(i);
 
-    //  cp === '#'     cp === '.'     nullterm
-    if (cp === 0x23 || cp === 0x2E || cp === 0) {
+    if (cp === HASH || cp === DOT || cp === 0) {
       if (mode === 0) {
-        tag = i  === 0 ? 'div'
-            : cp === 0 ? query
-            :            query.substring(start, i);
+        tag = (i === 0) ? 'div' : (cp === 0) ? query : query.substring(start, i);
       } else {
-        var slice = query.substring(start, i)
+        var slice = query.substring(start, i);
+
         if (mode === 1) {
           id = slice;
         } else if (className) {
@@ -32,78 +31,108 @@ function createElement (query, ns) {
       }
 
       start = i + 1;
-      mode = cp === 0x23 ? 1 : 2;
+      mode = (cp === HASH) ? 1 : 2;
     }
   }
-  if (ns) {
-    var element = doc.createElementNS(ns, tag);
-  } else {
-    var element = doc.createElement(tag);
-  }
+  var element = ns ? document.createElementNS(ns, tag) : document.createElement(tag);
 
-  if (id) element.id = id;
-  if (className) element.className = className;
+  if (id) { element.id = id; }
+  if (className) { element.className = className; }
 
   return element;
 }
 
+function text (content) {
+  return document.createTextNode(content);
+}
+
+function mount (parent, child, before) {
+  var parentEl = parent.el || parent;
+  var childEl = child.el || child;
+
+  if (childEl.__redom_list) {
+    childEl = childEl.el;
+  }
+
+  if (child === childEl && childEl.__redom_view) {
+    // try to look up the view if not provided
+    child = childEl.__redom_view;
+  }
+
+  if (child !== childEl) {
+    childEl.__redom_view = child;
+  }
+  if (before) {
+    parentEl.insertBefore(childEl, before.el || before);
+  } else {
+    parentEl.appendChild(childEl);
+  }
+  if (child.isMounted) {
+    child.remounted && child.remounted();
+  } else {
+    child.isMounted = true;
+    child.mounted && child.mounted();
+  }
+}
+
+function unmount (parent, child) {
+  var parentEl = parent.el || parent;
+  var childEl = child.el || child;
+
+  if (child === childEl && childEl.__redom_view) {
+    // try to look up the view if not provided
+    child = childEl.__redom_view;
+  }
+
+  parentEl.removeChild(childEl);
+
+  child.isMounted = false;
+  child.unmounted && child.unmounted();
+}
+
 var cache = {};
 
-function el (query, a) {
+function el (query) {
   var arguments$1 = arguments;
 
-  if (typeof query === 'function') {
-    var len = arguments.length - 1;
-    if (len > 1) {
-      var args = new Array(len);
-      var i = 0;
+  var element;
 
-      while (i < len) args[++i] = arguments$1[i];
-
-      return new (query.bind.apply(query, args));
-    } else {
-      return new query(a);
-    }
+  if (typeof query === 'string') {
+    element = (cache[query] || (cache[query] = createElement(query))).cloneNode(false);
+  } else if (query && query.nodeType) {
+    element = query.cloneNode(false);
+  } else {
+    throw new Error('At least one argument required');
   }
-  var element = (cache[query] || (cache[query] = createElement(query))).cloneNode(false);
+
   var empty = true;
 
   for (var i = 1; i < arguments.length; i++) {
     var arg = arguments$1[i];
 
-    while (typeof arg === 'function') {
-      arg = arg(element);
-    }
-
-    if (arg == null) {
+    if (!arg) {
       continue;
     }
 
-    if (arg.nodeType) {
-      element.appendChild(arg);
+    // support middleware
+    if (typeof arg === 'function') {
+      arg(element);
     } else if (typeof arg === 'string' || typeof arg === 'number') {
       if (empty) {
+        empty = false;
         element.textContent = arg;
       } else {
-        element.appendChild(doc.createTextNode(arg));
+        element.appendChild(text(arg));
       }
-    } else if (arg.el && arg.el.nodeType) {
-      var child = arg;
-      var childEl = arg.el;
-
-      if (child !== childEl) {
-        child.el = childEl;
-        childEl.__redom_view = child;
+    } else if (arg.nodeType || (arg.el && arg.el.nodeType)) {
+      empty = false;
+      mount(element, arg);
+    } else if (arg.length) {
+      empty = false;
+      for (var j = 0; j < arg.length; j++) {
+        mount(element, arg[j]);
       }
-
-      if (child.isMounted) {
-        child.remounted && child.remounted();
-      } else {
-        child.mounted && child.mounted();
-      }
-
-      element.appendChild(childEl);
-    } else {
+    } else if (typeof arg === 'object') {
       for (var key in arg) {
         var value = arg[key];
 
@@ -115,12 +144,8 @@ function el (query, a) {
               element.style[cssKey] = value[cssKey];
             }
           }
-          element[key] = value;
         } else if (key in element || typeof value === 'function') {
           element[key] = value;
-          if (key === 'autofocus') {
-            element.focus();
-          }
         } else {
           element.setAttribute(key, value);
         }
@@ -132,14 +157,13 @@ function el (query, a) {
 }
 
 el.extend = function (query) {
-  return el.bind(this, query);
-}
+  var clone = (cache[query] || (cache[query] = createElement(query)));
 
-function list (parent, View, key, initData) {
-  return new List(parent, View, key, initData);
-}
+  return el.bind(this, clone);
+};
 
-function List(parent, View, key, initData) {
+function List (parent, View, key, initData) {
+  this.__redom_list = true;
   this.View = View;
   this.key = key;
   this.initData = initData;
@@ -153,13 +177,12 @@ function List(parent, View, key, initData) {
 
 List.extend = function (parent, View, key, initData) {
   return List.bind(List, parent, View, key, initData);
-}
-
-list.extend = List.extend;
+};
 
 List.prototype.update = function (data) {
   var View = this.View;
   var key = this.key;
+  var functionKey = typeof key === 'function';
   var initData = this.initData;
   var views = this.views;
   var parent = this.el;
@@ -171,26 +194,31 @@ List.prototype.update = function (data) {
 
   for (var i = 0; i < data.length; i++) {
     var item = data[i];
+    var view;
+
     if (key) {
-      var id = typeof key === 'function' ? key(item) : item[key];
-      var view = views[i] = lookup[id] || (lookup[id] = new View(initData, item, i));
+      var id = functionKey ? key(item) : item[key];
+      view = views[i] = lookup[id] || (lookup[id] = new View(initData, item, i, data));
       view.__id = id;
     } else {
-      var view = views[i] || (views[i] = new View(initData, item, i));
+      view = views[i] || (views[i] = new View(initData, item, i, data));
     }
-    var el = view.el;
-    view.el = el;
-    el.__redom_view = view;
-    view.update && view.update(item);
+    var el$$1 = view.el;
+    if (el$$1.__redom_list) {
+      el$$1 = el$$1.el;
+    }
+    el$$1.__redom_view = view;
+    view.update && view.update(item, i, data);
 
-    if (traverse === el) {
+    if (traverse === el$$1) {
       traverse = traverse.nextSibling;
       continue;
     }
+
     if (traverse) {
-      parent.insertBefore(el, traverse);
+      parent.insertBefore(el$$1, traverse);
     } else {
-      parent.appendChild(el);
+      parent.appendChild(el$$1);
     }
     if (view.isMounted) {
       view.remounted && view.remounted();
@@ -202,85 +230,115 @@ List.prototype.update = function (data) {
 
   while (traverse) {
     var next = traverse.nextSibling;
+    var _view = traverse.__redom_view;
 
     if (key) {
-      var view = traverse.__redom_view;
-      if (view) {
-        var id = view.__id;
+      if (_view) {
+        id = _view.__id;
         lookup[id] = null;
       }
     }
     views[i++] = null;
     parent.removeChild(traverse);
 
+    _view.isMounted = false;
+    _view.unmounted && _view.unmounted();
+    traverse.__redom_view = null;
+
     traverse = next;
   }
 
   views.length = data.length;
-}
+};
 
-function mount (parent, child, before) {
-  if (child == null) {
-    return;
+var SVG = 'http://www.w3.org/2000/svg';
+
+var cache$1 = {};
+
+function svg (query, a) {
+  var arguments$1 = arguments;
+
+  var element;
+
+  if (typeof query === 'string') {
+    element = (cache$1[query] || (cache$1[query] = createElement(query, SVG))).cloneNode(false);
+  } else if (query && query.nodeType) {
+    element = query.cloneNode(false);
+  } else {
+    throw new Error('At least one argument required');
   }
 
-  var parentEl = parent.el || parent;
-  var childEl = child.el || child;
+  var empty = true;
 
-  if (childEl.nodeType) {
-    if (child !== childEl) {
-      childEl.view = child;
-    }
-    if (before) {
-      parentEl.insertBefore(childEl, before.el || before);
-    } else {
-      parentEl.appendChild(childEl);
-    }
-    if (child.isMounted) {
-      child.remounted && child.remounted();
-    } else {
-      child.isMounted = true;
-      child.mounted && child.mounted();
-    }
-    return true;
-  } else if (child.length) {
-    for (var i = 0; i < child.length; i++) {
-      var childEl = child.el || child;
+  for (var i = 1; i < arguments.length; i++) {
+    var arg = arguments$1[i];
 
-      if (child.isMounted) {
-        child.remounted && child.remounted();
+    if (!arg) {
+      continue;
+    } else if (typeof arg === 'function') {
+      arg = arg(element);
+    } else if (typeof arg === 'string' || typeof arg === 'number') {
+      if (empty) {
+        empty = false;
+        element.textContent = arg;
       } else {
-        child.isMounted = true;
-        child.mounted && child.mounted();
+        element.appendChild(text(arg));
+      }
+    } else if (arg.nodeType || (arg.el && arg.el.nodeType)) {
+      empty = false;
+      mount(element, arg);
+    } else if (typeof arg === 'object') {
+      for (var key in arg) {
+        var value = arg[key];
+
+        if (key === 'style' && typeof value !== 'string') {
+          for (var cssKey in value) {
+            element.style[cssKey] = value[cssKey];
+          }
+        } else if (typeof value === 'function') {
+          element[key] = value;
+        } else {
+          element.setAttribute(key, value);
+        }
       }
     }
-    return true;
   }
-  return false;
+
+  return element;
 }
 
-var hello = el('h1', 'Hello world!');
+svg.extend = function (query) {
+  var clone = (cache$1[query] || (cache$1[query] = createElement(query, SVG)));
 
-mount(document.body, hello);
-
-var Td = function Td () {
-  this.el = el('td');
-};
-Td.prototype.update = function update (data) {
-  this.el.textContent = data;
+  return svg.bind(this, clone);
 };
 
-var Tr = list.extend('tr', Td);
-var Table = list.extend('table', Tr);
+var App = function App () {
+  var this$1 = this;
 
-var table = new Table;
+  this.el = el('.app',
+    this.hello = new Hello(),
+    this.input = el('input', {
+      autofocus: true,
+      placeholder: 'RE:DOM',
+      oninput: function (e) { return this$1.hello.update(this$1.input.value); }
+    })
+  );
+};
 
-mount(document.body, table);
+var Hello = function Hello () {
+  this.el = el('h1',
+    'Hello ',
+    this.subject = text('RE:DOM'),
+    '!'
+  );
+};
+Hello.prototype.update = function update (subject) {
+  this.subject.textContent = subject || 'RE:DOM';
+};
 
-table.update([
-  [ 1, 2, 3 ],
-  [ 4, 5, 6 ],
-  [ 7, 8, 9 ]
-]);
+var app = new App();
+
+mount(document.body, app);
 
 }());

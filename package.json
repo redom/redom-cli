@@ -13,5 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "fs-extra": "~1.0.0"
+  },
+  "devDependencies": {
+    "nib": "~1.1.2",
+    "stylus": "~0.54.5"
   }
 }

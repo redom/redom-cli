@@ -1,27 +1,31 @@
-import { el, list, mount } from 'redom';
+import { el, text, mount } from 'redom';
 
-const hello = el('h1', 'Hello world!');
-
-mount(document.body, hello);
-
-class Td {
+class App {
   constructor () {
-    this.el = el('td');
-  }
-  update (data) {
-    this.el.textContent = data;
+    this.el = el('.app',
+      this.hello = new Hello(),
+      this.input = el('input', {
+        autofocus: true,
+        placeholder: 'RE:DOM',
+        oninput: e => this.hello.update(this.input.value)
+      })
+    );
   }
 }
 
-const Tr = list.extend('tr', Td);
-const Table = list.extend('table', Tr);
+class Hello {
+  constructor () {
+    this.el = el('h1',
+      'Hello ',
+      this.subject = text('RE:DOM'),
+      '!'
+    );
+  }
+  update (subject) {
+    this.subject.textContent = subject || 'RE:DOM';
+  }
+}
 
-const table = new Table();
+const app = new App();
 
-mount(document.body, table);
-
-table.update([
-  [ 1, 2, 3 ],
-  [ 4, 5, 6 ],
-  [ 7, 8, 9 ]
-]);
+mount(document.body, app);
