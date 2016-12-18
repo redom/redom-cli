@@ -3,9 +3,10 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
   plugins: [
-    buble(),
+    buble({
+      objectAssign: 'Object.assign'
+    }),
     nodeResolve({
-      main: true,
       jsnext: true
     })
   ]

@@ -6,10 +6,11 @@ class App {
       this.hello = new Hello(),
       this.input = el('input', {
         autofocus: true,
-        placeholder: 'RE:DOM',
-        oninput: e => this.hello.update(this.input.value)
+        placeholder: 'RE:DOM'
       })
     );
+
+    this.input.oninput = e => this.hello.update(this.input.value);
   }
 }
 
