@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "~1.0.0"
+    "fs-extra": "~2.0.0"
   },
   "devDependencies": {
     "nib": "~1.1.2",

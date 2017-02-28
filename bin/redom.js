@@ -82,7 +82,7 @@ function install (next) {
   console.log('');
   console.log('Installing to ' + data.absolutepath);
 
-  flow([makeDir, buildPackageJSON, copyJS, copyPublic, copyRollupConfig, copyServer, copyWatch, npmInstall]);
+  flow([makeDir, buildPackageJSON, copyJS, copyCSS, copyPublic, copyRollupConfig, copyServer, copyWatch, npmInstall]);
 
   function makeDir (cb) {
     fs.mkdirs(data.absolutepath, cb);
@@ -105,6 +105,12 @@ function install (next) {
   function copyPublic (cb) {
     var source = path.resolve(__dirname, '../assets/public');
     var target = path.resolve(data.path, 'public');
+    fs.copy(source, target, cb);
+  }
+
+  function copyCSS (cb) {
+    var source = path.resolve(__dirname, '../assets/css');
+    var target = path.resolve(data.path, 'css');
     fs.copy(source, target, cb);
   }
 
