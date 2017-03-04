@@ -5,7 +5,7 @@ Initialize [RE:DOM](https://redom.js.org) projects easily!
 $ npm install -g redom-cli
 $ redom
 $ npm install
-$ node server.js
+$ npm start
 ```
 - Open [http://localhost:8080](http://localhost:8080)
 - Start editing files in `js/`
