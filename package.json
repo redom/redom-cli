@@ -1,7 +1,7 @@
 {
   "name": "redom-cli",
   "version": "2.0.0",
-  "description": "",
+  "description": "RE:DOM project generator",
   "main": "index.js",
   "bin": {
     "redom": "bin/redom.js"
@@ -9,8 +9,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Juha Lindstedt",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pakastin/redom-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pakastin/redom-cli/issues"
+  },
   "dependencies": {
     "fs-extra": "~2.1.2"
   },
