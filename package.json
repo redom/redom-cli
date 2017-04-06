@@ -1,6 +1,6 @@
 {
   "name": "redom-cli",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "RE:DOM project generator",
   "main": "index.js",
   "bin": {
