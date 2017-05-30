@@ -1,23 +1,21 @@
 require('./server');
 
+const fs = require('fs');
 const cp = require('child_process');
-const chokidar = require('chokidar');
 
-exec('npm', ['run', 'build-css']);
-exec('npm', ['run', 'build-js']);
+const build = () => run('build');
+const uglify = () => run('uglify');
 
-chokidar.watch('css/**/*.styl')
-  .on('change', () => exec('npm', ['run', 'build-css']));
+fs.watch('js', build);
+fs.watch('public/js/main.js', uglify);
 
-chokidar.watch('js/**/*.js')
-  .on('change', () => exec('npm', ['run', 'build-js']));
+build();
 
-chokidar.watch('public/js/main.js')
-  .on('change', () => exec('npm', ['run', 'uglify-js']));
-
-function exec (cmd, args) {
-  const child = cp.spawn(cmd, args);
+function run (cmd) {
+  const child = cp.spawn('npm', ['run', cmd]);
 
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);
+
+  return child;
 }

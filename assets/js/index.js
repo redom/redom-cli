@@ -1,4 +1,10 @@
-import { el, text, mount } from 'redom';
+import { css, el, text, mount } from 'redom';
+
+css({
+  body: {
+    fontFamily: 'sans-serif'
+  }
+});
 
 class App {
   constructor () {
