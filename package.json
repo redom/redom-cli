@@ -13,10 +13,10 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pakastin/redom-cli.git"
+    "url": "git+https://github.com/redom/redom-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/pakastin/redom-cli/issues"
+    "url": "https://github.com/redom/redom-cli/issues"
   },
   "dependencies": {
     "fs-extra": "~3.0.1"
