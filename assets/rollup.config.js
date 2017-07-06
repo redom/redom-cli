@@ -1,4 +1,5 @@
 import buble from 'rollup-plugin-buble';
+import butternut from 'rollup-plugin-butternut';
 import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
@@ -6,8 +7,7 @@ export default {
     buble({
       objectAssign: 'Object.assign'
     }),
-    nodeResolve({
-      jsnext: true
-    })
+    butternut(),
+    nodeResolve()
   ]
 };

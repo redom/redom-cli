@@ -5,18 +5,23 @@
   "main": "server.js",
   "scripts": {
     "dev": "node watch",
-    "build": "rollup -c -f iife js/index.js -o public/js/main.js",
+    "build-css": "stylus -w -u nib css/index.styl -c -o public/css/main.css",
+    "build-js": "rollup -m -w -c -f iife js/index.js -o public/js/main.js",
     "uglify": "uglifyjs public/js/main.js -cm -o public/js/main.min.js",
     "start": "node server"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "redom": "~2.6.4",
-    "rollup": "~0.41.6",
+    "@redom/store": "~1.0.0",
+    "nib": "~1.1.2",
+    "redom": "~3.1.0",
+    "rollup": "~0.43.0",
     "rollup-plugin-buble": "~0.15.0",
+    "rollup-plugin-butternut": "~0.1.0",
     "rollup-plugin-node-resolve": "~3.0.0",
-    "uglify-js": "~3.0.13"
+    "rollup-watch": "~4.0.0",
+    "stylus": "~0.54.5"
   },
   "dependencies": {
     "compression": "~1.6.2",

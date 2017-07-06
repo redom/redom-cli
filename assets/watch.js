@@ -1,21 +1,43 @@
 require('./server');
 
-const fs = require('fs');
 const cp = require('child_process');
+const fs = require('fs');
 
-const build = () => run('build');
-const uglify = () => run('uglify');
+const utf8 = { encoding: 'utf8' };
 
-fs.watch('js', build);
-fs.watch('public/js/main.js', uglify);
+const buildCSS = () => run('build-css', true); // run forever
+const buildJS = () => run('build-js', true); // run forever
 
-build();
+setTimeout(() => {
+  buildCSS();
+  buildJS();
+}, 1000);
 
-function run (cmd) {
+fs.watch('public/js/main.js', () => {
+  fs.readFile('public/js/main.js', utf8, (err, src) => {
+    if (err) {
+      throw new Error(err);
+    }
+    fs.writeFile('public/js/main.min.js', src.split('\n')[0], utf8, (err) => {
+      if (err) {
+        throw new Error(err);
+      }
+      console.log('Written public/js/main.min.js');
+    });
+  });
+});
+
+function run (cmd, forever) {
   const child = cp.spawn('npm', ['run', cmd]);
 
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);
+
+  if (forever) {
+    child.on('exit', () => {
+      setTimeout(run, 5000, cmd, true);
+    });
+  }
 
   return child;
 }
