@@ -11,7 +11,7 @@ export const dispatch = (target, type, data) => {
 };
 
 export const listen = (target, handlers) => {
-  const el = target.el || el;
+  const el = target.el || target;
 
   const handler = e => {
     const { type, data } = e.detail;
