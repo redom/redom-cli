@@ -15,15 +15,15 @@
   "devDependencies": {
     "@redom/store": "~1.0.0",
     "nib": "~1.1.2",
-    "redom": "~3.2.1",
-    "rollup": "~0.47.4",
-    "rollup-plugin-buble": "~0.15.0",
+    "redom": "~3.8.8",
+    "rollup": "~0.52.1",
+    "rollup-plugin-buble": "~0.18.0",
     "rollup-plugin-butternut": "~0.1.0",
     "rollup-plugin-node-resolve": "~3.0.0",
     "stylus": "~0.54.5"
   },
   "dependencies": {
-    "compression": "~1.7.0",
-    "express": "~4.15.4"
+    "compression": "~1.7.1",
+    "express": "~4.16.2"
   }
 }
