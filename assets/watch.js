@@ -3,6 +3,9 @@ require('./server');
 const cp = require('child_process');
 const fs = require('fs');
 
+const isWindows = require('process').platform === 'win32';
+const npm = isWindows ? 'npm.cmd' : 'npm';
+
 const utf8 = { encoding: 'utf8' };
 
 const buildCSS = () => run('build-css', true); // run forever
@@ -28,7 +31,7 @@ fs.watch('public/js/main.js', () => {
 });
 
 function run (cmd, forever) {
-  const child = cp.spawn('npm', ['run', cmd]);
+  const child = cp.spawn(npm, ['run', cmd]);
 
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);
