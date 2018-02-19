@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "RE:DOM example project",
   "main": "server.js",
+  "private": true,
   "scripts": {
     "dev": "node watch",
     "build-css": "stylus -w -u nib css/index.styl -c -o public/css/main.css",
