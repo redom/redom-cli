@@ -19,7 +19,7 @@
     "url": "https://github.com/redom/redom-cli/issues"
   },
   "dependencies": {
-    "fs-extra": "~8.1.0"
+    "fs-extra": "~9.0.0"
   },
   "devDependencies": {
     "nib": "~1.1.2",
